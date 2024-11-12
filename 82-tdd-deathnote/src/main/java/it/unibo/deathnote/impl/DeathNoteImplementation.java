@@ -6,7 +6,7 @@ import java.util.*;
 
 public class DeathNoteImplementation implements DeathNote {
 
-    public class DeathArgs {
+    private class DeathArgs {
         String cause;
         String details;
     }
