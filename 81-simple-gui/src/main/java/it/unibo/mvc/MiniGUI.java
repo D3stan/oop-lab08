@@ -29,24 +29,21 @@ public class MiniGUI {
         final JButton write = new JButton("Print a random number on standard output");
         frame.setContentPane(canvas);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
         // Part 1
         final JPanel boxPanel = new JPanel();
         boxPanel.setLayout(new BoxLayout(boxPanel, BoxLayout.X_AXIS));
         boxPanel.add(write);
         canvas.add(boxPanel, BorderLayout.CENTER);
-
         // Part 2
         final JTextField boxTextField = new JTextField(TEXT_FIELD_LABEL);
         canvas.add(boxTextField, BorderLayout.NORTH);
-
         /*
          * Handlers
          */
         write.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                int randNum = randomGenerator.nextInt();
+                final int randNum = randomGenerator.nextInt();
                 System.out.println(randNum);
                 boxTextField.setText(TEXT_FIELD_LABEL + randNum);
             }
