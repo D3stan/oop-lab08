@@ -2,6 +2,7 @@ package it.unibo.deathnote;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -26,6 +27,14 @@ class TestDeathNote {
     
     private DeathNote myDeathNote;
 
+    private String writeNewHuman(String modifier) {
+        while (myDeathNote.isNameWritten(modifier)) {
+            modifier += String.valueOf(randomGenerator.nextInt());
+        }
+        myDeathNote.writeName(modifier);
+        return modifier;
+    }
+
     @BeforeEach
     public void setUp() {
         myDeathNote = new DeathNoteImplementation();
@@ -36,9 +45,9 @@ class TestDeathNote {
         try {
             myDeathNote.getRule(ZERO_RULE_BOUND);
             myDeathNote.getRule(NEG_RULE_BOUND);
-        } catch (Exception exception) {
-            if (exception.getClass() != IllegalArgumentException.class ||
-                exception.getMessage() != null
+        } catch (Exception e) {
+            if (e.getClass() != IllegalArgumentException.class ||
+                e.getMessage() == null
             ) {
                 fail();
             }
@@ -55,7 +64,7 @@ class TestDeathNote {
                     fail();
                 }
             }
-        } catch (Exception exception) {
+        } catch (Exception e) {
             fail();
         }
     }
@@ -77,30 +86,49 @@ class TestDeathNote {
     void testCauseTiming() throws InterruptedException {
         try {
             myDeathNote.writeDeathCause(String.valueOf(randomGenerator.nextInt()));
+        } catch (Exception e) {
+            if (e.getClass() != IllegalStateException.class) {
+                fail();
+            }
+        }
+
+        String newHumanName = writeNewHuman(HUMAN);
+        Thread.sleep(CAUSE_MILLIS + 2);
+        assertEquals(myDeathNote.getDeathCause(newHumanName), "heart attack");
+        
+        newHumanName = writeNewHuman(HUMAN);
+        myDeathNote.writeDeathCause("karting accident");
+        assertEquals(myDeathNote.getDeathCause(newHumanName), "karting accident");
+        Thread.sleep(100);
+
+        myDeathNote.writeDeathCause("swimming accident");
+        assertEquals(myDeathNote.getDeathCause(newHumanName), "karting accident");
+    }
+
+    @Test
+    void testDetailsTiming() throws InterruptedException {
+        try {
+            myDeathNote.writeDetails(String.valueOf(randomGenerator.nextInt()));
         } catch (Exception exception) {
             if (exception.getClass() != IllegalStateException.class) {
                 fail();
             }
         }
 
-        String modifier = HUMAN;
-        while (myDeathNote.isNameWritten(modifier)) {
-            modifier += String.valueOf(randomGenerator.nextInt());
-        }
-        myDeathNote.writeName(modifier);
-        Thread.sleep(CAUSE_MILLIS + 2);
-        assertEquals(myDeathNote.getDeathCause(modifier), "heart attack");
-        
-        modifier = HUMAN;
-        while (myDeathNote.isNameWritten(modifier)) {
-            modifier += String.valueOf(randomGenerator.nextInt());
-        }
-        myDeathNote.writeName(modifier);
-        myDeathNote.writeDeathCause("karting accident");
-        assertEquals(myDeathNote.getDeathCause(modifier), "karting accident");
-        Thread.sleep(100);
+        String newHumanName = writeNewHuman(HUMAN);
+        assertEquals("", myDeathNote.getDeathDetails(newHumanName));
+        assertTrue(myDeathNote.writeDetails("ran for too long"));
+        assertEquals("ran for too long", myDeathNote.getDeathDetails(newHumanName));
 
-        myDeathNote.writeDeathCause("swimming accident");
-        assertEquals(myDeathNote.getDeathCause(modifier), "karting accident");
+        newHumanName = writeNewHuman(HUMAN);
+        Thread.sleep(6100);
+        try {
+            myDeathNote.writeDetails("ran for too long");
+        } catch (Exception e) {
+            if (e.getClass() != IllegalStateException.class) {
+                fail();
+            }
+        }
+        assertEquals("", myDeathNote.getDeathDetails(newHumanName));
     }
 }
