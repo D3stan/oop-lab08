@@ -3,13 +3,11 @@ package it.unibo.deathnote;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtensionContextException;
 
 import it.unibo.deathnote.api.DeathNote;
 import it.unibo.deathnote.impl.DeathNoteImplementation;
@@ -47,7 +45,9 @@ class TestDeathNote {
             myDeathNote.getRule(NEG_RULE_BOUND);
         } catch (Exception e) {
             if (e.getClass() != IllegalArgumentException.class ||
-                e.getMessage() == null
+                e.getMessage() == null ||
+                e.getMessage().isBlank() ||
+                e.getMessage().isEmpty()
             ) {
                 fail();
             }
@@ -116,7 +116,7 @@ class TestDeathNote {
         }
 
         String newHumanName = writeNewHuman(HUMAN);
-        assertEquals("", myDeathNote.getDeathDetails(newHumanName));
+        assertNull(myDeathNote.getDeathDetails(newHumanName));
         assertTrue(myDeathNote.writeDetails("ran for too long"));
         assertEquals("ran for too long", myDeathNote.getDeathDetails(newHumanName));
 
@@ -129,6 +129,6 @@ class TestDeathNote {
                 fail();
             }
         }
-        assertEquals("", myDeathNote.getDeathDetails(newHumanName));
+        assertNull(myDeathNote.getDeathDetails(newHumanName));
     }
 }

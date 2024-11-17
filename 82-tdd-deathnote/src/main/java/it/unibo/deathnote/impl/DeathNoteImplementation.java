@@ -6,6 +6,7 @@ import java.util.*;
 
 public class DeathNoteImplementation implements DeathNote {
     
+    private static final String DEFAULT_DEATH_CAUSE = "heart attack";
     private Map<String, DeathArgs> names;
     private String lastName;
     private long lastNameModification;
@@ -25,7 +26,7 @@ public class DeathNoteImplementation implements DeathNote {
     @Override
     public void writeName(final String name) {
         Objects.requireNonNull(name);
-        names.put(name, new DeathArgs());
+        names.put(name, new DeathArgs(DEFAULT_DEATH_CAUSE));
         lastName = name;
         lastNameModification = System.currentTimeMillis();
     }
@@ -49,7 +50,7 @@ public class DeathNoteImplementation implements DeathNote {
         if (names.isEmpty() || details == null || details.length() == 0) {
             throw new IllegalStateException("Death cause must be valid");
         }
-        if (System.currentTimeMillis() - lastNameModification <= 400) {
+        if (System.currentTimeMillis() - lastNameModification <= 6040) {
             names.get(this.lastName).details = details;
             return true;
         } else {
@@ -85,6 +86,10 @@ public class DeathNoteImplementation implements DeathNote {
     private class DeathArgs {
         String cause;
         String details;
+
+        public DeathArgs(String cause) {
+            this.cause = cause;
+        }
     }
 
 }
